@@ -10,6 +10,10 @@
 		33D48EFD1B834D6700C76D98 /* SwiftGQL.h in Headers */ = {isa = PBXBuildFile; fileRef = 33D48EFC1B834D6700C76D98 /* SwiftGQL.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		33D48F041B834D6700C76D98 /* SwiftGQL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33D48EF91B834D6700C76D98 /* SwiftGQL.framework */; };
 		33D48F091B834D6700C76D98 /* SwiftGQLTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D48F081B834D6700C76D98 /* SwiftGQLTests.swift */; };
+		33D48F141B834D8800C76D98 /* Language.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D48F131B834D8800C76D98 /* Language.swift */; };
+		33D48F161B834D8F00C76D98 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D48F151B834D8F00C76D98 /* Types.swift */; };
+		33D48F181B85D9AE00C76D98 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D48F171B85D9AE00C76D98 /* Error.swift */; };
+		33D48F1A1B85F6B100C76D98 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D48F191B85F6B100C76D98 /* Utils.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -29,6 +33,10 @@
 		33D48F031B834D6700C76D98 /* SwiftGQLTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftGQLTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		33D48F081B834D6700C76D98 /* SwiftGQLTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftGQLTests.swift; sourceTree = "<group>"; };
 		33D48F0A1B834D6700C76D98 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		33D48F131B834D8800C76D98 /* Language.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Language.swift; sourceTree = "<group>"; };
+		33D48F151B834D8F00C76D98 /* Types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
+		33D48F171B85D9AE00C76D98 /* Error.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
+		33D48F191B85F6B100C76D98 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,7 +80,11 @@
 			isa = PBXGroup;
 			children = (
 				33D48EFC1B834D6700C76D98 /* SwiftGQL.h */,
+				33D48F131B834D8800C76D98 /* Language.swift */,
+				33D48F151B834D8F00C76D98 /* Types.swift */,
 				33D48EFE1B834D6700C76D98 /* Info.plist */,
+				33D48F171B85D9AE00C76D98 /* Error.swift */,
+				33D48F191B85F6B100C76D98 /* Utils.swift */,
 			);
 			path = SwiftGQL;
 			sourceTree = "<group>";
@@ -142,6 +154,7 @@
 		33D48EF01B834D6700C76D98 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0700;
 				LastUpgradeCheck = 0700;
 				ORGANIZATIONNAME = hc.gg;
 				TargetAttributes = {
@@ -193,6 +206,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				33D48F141B834D8800C76D98 /* Language.swift in Sources */,
+				33D48F181B85D9AE00C76D98 /* Error.swift in Sources */,
+				33D48F161B834D8F00C76D98 /* Types.swift in Sources */,
+				33D48F1A1B85F6B100C76D98 /* Utils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -302,6 +319,7 @@
 		33D48F0E1B834D6700C76D98 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -314,12 +332,14 @@
 				PRODUCT_BUNDLE_IDENTIFIER = gg.hc.SwiftGQL;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
 			name = Debug;
 		};
 		33D48F0F1B834D6700C76D98 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
