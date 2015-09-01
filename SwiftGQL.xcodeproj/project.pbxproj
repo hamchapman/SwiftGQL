@@ -14,6 +14,7 @@
 		33D48F161B834D8F00C76D98 /* Types.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D48F151B834D8F00C76D98 /* Types.swift */; };
 		33D48F181B85D9AE00C76D98 /* Error.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D48F171B85D9AE00C76D98 /* Error.swift */; };
 		33D48F1A1B85F6B100C76D98 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D48F191B85F6B100C76D98 /* Utils.swift */; };
+		33E623901B946CE300C930AD /* Language-Schema.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33E6238F1B946CE300C930AD /* Language-Schema.swift */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,6 +38,7 @@
 		33D48F151B834D8F00C76D98 /* Types.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Types.swift; sourceTree = "<group>"; };
 		33D48F171B85D9AE00C76D98 /* Error.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Error.swift; sourceTree = "<group>"; };
 		33D48F191B85F6B100C76D98 /* Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		33E6238F1B946CE300C930AD /* Language-Schema.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Language-Schema.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -85,6 +87,7 @@
 				33D48EFE1B834D6700C76D98 /* Info.plist */,
 				33D48F171B85D9AE00C76D98 /* Error.swift */,
 				33D48F191B85F6B100C76D98 /* Utils.swift */,
+				33E6238F1B946CE300C930AD /* Language-Schema.swift */,
 			);
 			path = SwiftGQL;
 			sourceTree = "<group>";
@@ -206,6 +209,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				33E623901B946CE300C930AD /* Language-Schema.swift in Sources */,
 				33D48F141B834D8800C76D98 /* Language.swift in Sources */,
 				33D48F181B85D9AE00C76D98 /* Error.swift in Sources */,
 				33D48F161B834D8F00C76D98 /* Types.swift in Sources */,
@@ -396,6 +400,7 @@
 				33D48F0F1B834D6700C76D98 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		33D48F101B834D6700C76D98 /* Build configuration list for PBXNativeTarget "SwiftGQLTests" */ = {
 			isa = XCConfigurationList;
@@ -404,6 +409,7 @@
 				33D48F121B834D6700C76D98 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

@@ -61,7 +61,6 @@ struct SourceLocation {
 }
 
 func matchesForRegexInText(regex: String!, text: String!) -> [String] {
-    
     do {
         let regex = try NSRegularExpression(pattern: regex, options: [])
         let nsString = text as NSString
@@ -575,7 +574,7 @@ extension String {
         if (self.characters.count - 1 < i) {
             return nil
         } else {
-            return self[advance(self.startIndex, i)]
+            return self[self.startIndex.advancedBy(i)]
         }
     }
 }
@@ -594,7 +593,7 @@ func charCodeAt(body: String, position: Int) -> Int? {
 }
 
 func slice(str: String, start: Int, position: Int) -> String {
-    return str.substringWithRange(Range(start: advance(str.startIndex, start), end: advance(str.startIndex, position)))
+    return str.substringWithRange(Range(start: str.startIndex.advancedBy(start), end: str.startIndex.advancedBy(position)))
 }
 
 /**
@@ -796,14 +795,14 @@ func readString(source: Source, start: Int) -> Token {
                 value += slice(body, start: chunkStart, position: position - 1)
                 code = charCodeAt(body, position: position)!
                 switch code! {
-                case 34: value += "\""; break;
-                case 47: value += "\u{47}"; break;
-                case 92: value += "\\"; break;
-                case 98: value += "\u{8}"; break;
-                case 102: value += "\u{12}"; break;
-                case 110: value += "\n"; break;
-                case 114: value += "\r"; break;
-                case 116: value += "\t"; break;
+                case 34: value += "\""; break
+                case 47: value += "\u{47}"; break
+                case 92: value += "\\"; break
+                case 98: value += "\u{8}"; break
+                case 102: value += "\u{12}"; break
+                case 110: value += "\n"; break
+                case 114: value += "\r"; break
+                case 116: value += "\t"; break
                 case 117:
 //                    returns nil now instead of -1
                     var charCode = uniCharCode(
@@ -817,17 +816,17 @@ func readString(source: Source, start: Int) -> Token {
                             source,
                             position,
                             "Bad character escape sequence."
-                        );
+                        )
                     }
                     value += fromCharCode(charCode)
-                    position += 4;
-                    break;
+                    position += 4
+                    break
                 default:
                     throw syntaxError(
                         source,
                         position,
                         "Bad character escape sequence."
-                    );
+                    )
                 }
                 position++
                 chunkStart = position
@@ -868,29 +867,29 @@ func uniCharCode(a: String, b: String, c: String, d: String) -> Int? {
 * [_A-Za-z][_0-9A-Za-z]*
 */
 func readName(source: Source, position: Int) -> Token {
-    var body = source.body
+    let body = source.body
     let bodyLength = body.characters.count
     var end = position + 1
     var code = charCodeAt(body, position: end)
     
     while (
         end != bodyLength &&
-            (
-                code == 95 || // _
-                code >= 48 && code <= 57 || // 0-9
-                code >= 65 && code <= 90 || // A-Z
-                code >= 97 && code <= 122 // a-z
-            )
-        ) {
-            end++
-            code = charCodeAt(body, position: end)
+        (
+            code == 95 || // _
+            code >= 48 && code <= 57 || // 0-9
+            code >= 65 && code <= 90 || // A-Z
+            code >= 97 && code <= 122 // a-z
+        )
+    ) {
+        end++
+        code = charCodeAt(body, position: end)
     }
     return makeToken(
         TokenKind.NAME.rawValue,
         start: position,
         end: end,
         value: slice(body, start: position, position: end)
-    );
+    )
 }
 
 
@@ -995,7 +994,7 @@ func expect(parser: Parser, kind: String) -> Token {
         parser.source,
         token.start,
         "Expected \(kind), found \(getTokenDesc(token))"
-    );
+    )
 }
 
 /**
@@ -1005,15 +1004,15 @@ func expect(parser: Parser, kind: String) -> Token {
 */
 func expectKeyword(parser: Parser, value: String) -> Token {
     let token = parser.token
-    if token.kind == TokenKind.NAME && token.value == value {
+    if token.kind == TokenKind.NAME.rawValue && token.value == value {
         advance(parser)
-        return token;
+        return token
     }
     throw syntaxError(
         parser.source,
         token.start,
         "Expected \(value), found \(getTokenDesc(token))"
-    );
+    )
 }
 
 /**
@@ -1027,7 +1026,7 @@ func unexpected(parser: Parser, atToken: Token?) -> BaseError {
         parser.source,
         token.start,
         "Unexpected \(getTokenDesc(token))"
-    );
+    )
 }
 
 /**
@@ -1037,9 +1036,9 @@ func unexpected(parser: Parser, atToken: Token?) -> BaseError {
 * to the next lex token after the closing token.
 */
 func any<T>(parser: Parser, openKind: Int, parseFn: (parser: Parser) -> T, closeKind: Int) -> [T] {
-    expect(parser: parser, kind: openKind)
+    expect(parser, kind: getTokenKindDesc(openKind))
     var nodes: [T] = []
-    while !skip(parser, kind: closeKind) {
+    while !skip(parser, kind: getTokenKindDesc(closeKind)) {
         nodes.append(parseFn(parser: parser))
     }
     return nodes
@@ -1052,9 +1051,9 @@ func any<T>(parser: Parser, openKind: Int, parseFn: (parser: Parser) -> T, close
 * to the next lex token after the closing token.
 */
 func many<T>(parser: Parser, openKind: Int, parseFn: (parser: Parser) -> T, closeKind: Int) -> [T] {
-    expect(parser, kind: openKind)
+    expect(parser, kind: getTokenKindDesc(openKind))
     var nodes = [parseFn(parser: parser)]
-    while !skip(parser, kind: closeKind) {
+    while !skip(parser, kind: getTokenKindDesc(closeKind)) {
         nodes.append(parseFn(parser: parser))
     }
     return nodes
@@ -1104,40 +1103,32 @@ func parseValue(source: String, options: ParseOptions?) -> Value {
 */
 func parseName(parser: Parser) -> Name {
     // TODO: Fix this
-    var token = expect(parser: parser, kind: getTokenDesc(token: TokenKind.NAME))
-    return Name(value: token.value, loc: loc(parser: parser, start: token.start))
-//    {
-//        kind: NAME,
-//        value: token.value,
-//        loc: loc(parser, token.start)
-//    };
+    let token = expect(parser, kind: getTokenKindDesc(TokenKind.NAME.rawValue))
+    return Name(value: token.value!, loc: loc(parser, start: token.start))
 }
 
 // Implements the parsing rules in the Document section.
 
 func parseDocument(parser: Parser) -> Document {
     var start = parser.token.start
-    var definitions = []
-    do {
-        if (peek(parser, TokenKind.BRACE_L)) {
-            definitions.push(parseOperationDefinition(parser));
-        } else if (peek(parser, TokenKind.NAME)) {
-            if (parser.token.value === 'query' || parser.token.value === 'mutation') {
-                definitions.push(parseOperationDefinition(parser));
-            } else if (parser.token.value === 'fragment') {
-                definitions.push(parseFragmentDefinition(parser));
+    // TODO: Make it not anyobject
+    var definitions: [Definition]
+    repeat {
+        if peek(parser, kind: getTokenKindDesc(TokenKind.BRACE_L.rawValue)) {
+            definitions.append(parseOperationDefinition(parser))
+        } else if peek(parser, kind: getTokenKindDesc(TokenKind.NAME.rawValue)) {
+            if parser.token.value == "query" || parser.token.value == "mutation" {
+                definitions.append(parseOperationDefinition(parser))
+            } else if parser.token.value == "fragment" {
+                definitions.append(parseFragmentDefinition(parser))
             } else {
-                throw unexpected(parser);
+                throw unexpected(parser)
             }
         } else {
-            throw unexpected(parser);
+            throw unexpected(parser)
         }
-    } while (!skip(parser, TokenKind.EOF));
-    return {
-        kind: DOCUMENT,
-        definitions,
-        loc: loc(parser, start)
-    };
+    } while !skip(parser, kind: getTokenKindDesc(TokenKind.EOF.rawValue))
+    return Document(definitions: definitions, loc: loc(parser, start: start))
 }
 
 
@@ -1169,7 +1160,7 @@ func parseOperationDefinition(parser: Parser) -> OperationDefinition {
     };
 }
 
-function parseVariableDefinitions(parser): Array<VariableDefinition> {
+func parseVariableDefinitions(parser: Parser) -> [VariableDefinition] {
     return peek(parser, TokenKind.PAREN_L) ?
         many(
             parser,
@@ -1180,7 +1171,7 @@ function parseVariableDefinitions(parser): Array<VariableDefinition> {
         [];
 }
 
-function parseVariableDefinition(parser): VariableDefinition {
+func parseVariableDefinition(parser: Parser) -> VariableDefinition {
     var start = parser.token.start;
     return {
         kind: VARIABLE_DEFINITION,
@@ -1192,18 +1183,18 @@ function parseVariableDefinition(parser): VariableDefinition {
     };
 }
 
-function parseVariable(parser): Variable {
+func parseVariable(parser: Parser) -> Variable {
     var start = parser.token.start;
-    expect(parser, TokenKind.DOLLAR);
+    expect(parser, TokenKind.DOLLAR)
     return {
         kind: VARIABLE,
         name: parseName(parser),
         loc: loc(parser, start)
-    };
+    }
 }
 
-function parseSelectionSet(parser): SelectionSet {
-    var start = parser.token.start;
+func parseSelectionSet(parser: Parser) -> SelectionSet {
+    var start = parser.token.start
     return {
         kind: SELECTION_SET,
         selections:
@@ -1212,7 +1203,7 @@ function parseSelectionSet(parser): SelectionSet {
     };
 }
 
-function parseSelection(parser): Selection {
+func parseSelection(parser: Parser) -> Selection {
     return peek(parser, TokenKind.SPREAD) ?
         parseFragment(parser) :
         parseField(parser);
@@ -1221,18 +1212,18 @@ function parseSelection(parser): Selection {
 /**
 * Corresponds to both Field and Alias in the spec
 */
-function parseField(parser): Field {
-    var start = parser.token.start;
+func parseField(parser: Parser) -> Field {
+    var start = parser.token.start
     
-    var nameOrAlias = parseName(parser);
-    var alias;
-    var name;
+    var nameOrAlias = parseName(parser)
+    var alias
+    var name
     if (skip(parser, TokenKind.COLON)) {
-        alias = nameOrAlias;
-        name = parseName(parser);
+        alias = nameOrAlias
+        name = parseName(parser)
     } else {
-        alias = null;
-        name = nameOrAlias;
+        alias = nil
+        name = nameOrAlias
     }
     
     return {
@@ -1244,16 +1235,16 @@ function parseField(parser): Field {
         selectionSet:
         peek(parser, TokenKind.BRACE_L) ? parseSelectionSet(parser) : null,
         loc: loc(parser, start)
-    };
+    }
 }
 
-function parseArguments(parser): Array<Argument> {
+func parseArguments(parser: Parser) -> [Argument] {
     return peek(parser, TokenKind.PAREN_L) ?
         many(parser, TokenKind.PAREN_L, parseArgument, TokenKind.PAREN_R) :
-        [];
+        []
 }
 
-function parseArgument(parser): Argument {
+func parseArgument(parse: Parserr) -> Argument {
     var start = parser.token.start;
     return {
         kind: ARGUMENT,
@@ -1269,7 +1260,7 @@ function parseArgument(parser): Argument {
 /**
 * Corresponds to both FragmentSpread and InlineFragment in the spec
 */
-function parseFragment(parser): FragmentSpread | InlineFragment {
+func parseFragment(parser: Parser) -> FragmentSpread | InlineFragment {
     var start = parser.token.start;
     expect(parser, TokenKind.SPREAD);
     if (parser.token.value === 'on') {
@@ -1290,14 +1281,14 @@ function parseFragment(parser): FragmentSpread | InlineFragment {
     };
 }
 
-function parseFragmentName(parser): Name {
-    if (parser.token.value === 'on') {
-        throw unexpected(parser);
+func parseFragmentName(parser: Parser) -> Name {
+    if parser.token.value == "on" {
+        throw unexpected(parser)
     }
-    return parseName(parser);
+    return parseName(parser)
 }
 
-function parseFragmentDefinition(parser): FragmentDefinition {
+func parseFragmentDefinition(parser: Parser) -> FragmentDefinition {
     var start = parser.token.start;
     expectKeyword(parser, 'fragment');
     return {
@@ -1307,82 +1298,66 @@ function parseFragmentDefinition(parser): FragmentDefinition {
         directives: parseDirectives(parser),
         selectionSet: parseSelectionSet(parser),
         loc: loc(parser, start)
-    };
+    }
 }
 
 
 // Implements the parsing rules in the Values section.
 
-export function parseConstValue(parser): Value {
-    return parseValueLiteral(parser, true);
+func parseConstValue(parser: Parser) -> Value {
+    return parseValueLiteral(parser, isConst: true)
 }
 
-function parseValueValue(parser): Value {
-    return parseValueLiteral(parser, false);
+func parseValueValue(parser: Parser) -> Value {
+    return parseValueLiteral(parser, isConst: false)
 }
 
-function parseValueLiteral(parser, isConst: boolean): Value {
-    var token = parser.token;
-    switch (token.kind) {
-    case TokenKind.BRACKET_L:
-        return parseList(parser, isConst);
-    case TokenKind.BRACE_L:
-        return parseObject(parser, isConst);
-    case TokenKind.INT:
-        advance(parser);
-        return {
-            kind: INT,
-            value: token.value,
-            loc: loc(parser, token.start)
-        };
-    case TokenKind.FLOAT:
-        advance(parser);
-        return {
-            kind: FLOAT,
-            value: token.value,
-            loc: loc(parser, token.start)
-        };
-    case TokenKind.STRING:
-        advance(parser);
-        return {
-            kind: STRING,
-            value: token.value,
-            loc: loc(parser, token.start)
-        };
-    case TokenKind.NAME:
-        if (token.value === 'true' || token.value === 'false') {
-            advance(parser);
-            return {
-                kind: BOOLEAN,
-                value: token.value === 'true',
-                loc: loc(parser, token.start)
-            };
-        } else if (token.value !== 'null') {
-            advance(parser);
-            return {
-                kind: ENUM,
-                value: token.value,
-                loc: loc(parser, token.start)
-            };
+func parseValueLiteral(parser: Parser, isConst: Bool) -> Value {
+    let token = parser.token
+    switch token.kind {
+    case TokenKind.BRACKET_L.rawValue:
+        return parseList(parser, isConst: isConst)
+    case TokenKind.BRACE_L.rawValue:
+        return parseObject(parser, isConst: isConst)
+    case TokenKind.INT.rawValue:
+        advance(parser)
+        return IntValue(value: token.value!, loc: loc(parser, start: token.start))
+    case TokenKind.FLOAT.rawValue:
+        advance(parser)
+        return FloatValue(value: token.value!, loc: loc(parser, start: token.start))
+    case TokenKind.STRING.rawValue:
+        advance(parser)
+        return StringValue(value: token.value!, loc: loc(parser, start: token.start))
+    case TokenKind.NAME.rawValue:
+        if token.value == "true" || token.value == "false" {
+            advance(parser)
+            return BooleanValue(value: token.value! == "true", loc: loc(parser, start: token.start))
+        } else if token.value != "null" {
+            advance(parser)
+            return EnumValue(value: token.value!, loc: loc(parser, start: token.start))
         }
-        break;
-    case TokenKind.DOLLAR:
-        if (!isConst) {
-            return parseVariable(parser);
+        break
+    case TokenKind.DOLLAR.rawValue:
+        if !isConst {
+            return parseVariable(parser)
         }
-        break;
+        break
     }
-    throw unexpected(parser);
+    throw unexpected(parser)
 }
 
-function parseList(parser, isConst: boolean): ListValue {
-    var start = parser.token.start;
-    var item = isConst ? parseConstValue : parseValueValue;
-    return {
-        kind: LIST,
-        values: any(parser, TokenKind.BRACKET_L, item, TokenKind.BRACKET_R),
-        loc: loc(parser, start)
-    };
+func parseList(parser: Parser, isConst: Bool) -> ListValue {
+    var start = parser.token.start
+    var item = isConst ? parseConstValue : parseValueValue
+    return ListValue(
+        values: any(
+                    parser,
+                    openKind: TokenKind.BRACKET_L.rawValue,
+                    item,
+                    closeKind: TokenKind.BRACKET_R.rawValue
+                ),
+        loc: loc(parser, start: token.start)
+    )
 }
 
 func parseObject(parser: Parser, isConst: Bool) -> ObjectValue {
@@ -1435,17 +1410,18 @@ func parseDirective(parser: Parser) -> Directive {
 * Handles the Type: NamedType, ListType, and NonNullType parsing rules.
 */
 // TODO: Make generic if possible or setup multi functions to return different types
+// Might have to do some casting after returning AnyObject
 func parseType(parser: Parser) -> Type {
     let start = parser.token.start
     var type: Type
-    if skip(parser: parser, kind: getTokenDesc(TokenKind.BRACKET_L)) {
+    if skip(parser, kind: getTokenKindDesc(TokenKind.BRACKET_L.rawValue)) {
         type = parseType(parser)
-        expect(parser, TokenKind.BRACKET_R)
+        expect(parser, kind: getTokenKindDesc(TokenKind.BRACKET_R.rawValue))
         type = ListType(type: type, loc: loc(parser, start: start))
     } else {
         type = parseNamedType(parser)
     }
-    if skip(parser: parser, kind: getTokenDesc(TokenKind.BANG)) {
+    if skip(parser, kind: getTokenKindDesc(TokenKind.BANG.rawValue)) {
         return NonNullType(type: type, loc: loc(parser, start: start))
     }
     return type
@@ -1455,3 +1431,303 @@ func parseNamedType(parser: Parser) -> NamedType {
     let start = parser.token.start
     return NamedType(name: parseName(parser), loc: loc(parser, start: start))
 }
+
+
+
+// **Visitor**
+
+var QueryDocumentKeys = {
+    Name: [],
+    
+    Document: [ "definitions" ],
+    OperationDefinition:
+    [ "name", "variableDefinitions", "directives", "selectionSet" ],
+    VariableDefinition: [ "variable", "type", "defaultValue" ],
+    Variable: [ "name" ],
+    SelectionSet: [ "selections" ],
+    Field: [ "alias", "name", "arguments", "directives", "selectionSet" ],
+    Argument: [ "name", "value" ],
+    
+    FragmentSpread: [ "name", "directives" ],
+    InlineFragment: [ "typeCondition", "directives", "selectionSet" ],
+    FragmentDefinition: [ "name", "typeCondition", "directives", "selectionSet" ],
+    
+    IntValue: [],
+    FloatValue: [],
+    StringValue: [],
+    BooleanValue: [],
+    EnumValue: [],
+    ListValue: [ "values" ],
+    ObjectValue: [ "fields" ],
+    ObjectField: [ "name", "value" ],
+    
+    Directive: [ "name", "arguments" ],
+    
+    NamedType: [ "name" ],
+    ListType: [ "type" ],
+    NonNullType: [ "type" ],
+}
+
+export const BREAK = {}
+
+/**
+* visit() will walk through an AST using a depth first traversal, calling
+* the visitor's enter function at each node in the traversal, and calling the
+* leave function after visiting that node and all of it's child nodes.
+*
+* By returning different values from the enter and leave functions, the
+* behavior of the visitor can be altered, including skipping over a sub-tree of
+* the AST (by returning false), editing the AST by returning a value or null
+* to remove the value, or to stop the whole traversal by returning BREAK.
+*
+* When using visit() to edit an AST, the original AST will not be modified, and
+* a new version of the AST with the changes applied will be returned from the
+* visit function.
+*
+*     var editedAST = visit(ast, {
+*       enter(node, key, parent, path, ancestors) {
+*         // @return
+*         //   undefined: no action
+*         //   false: skip visiting this node
+*         //   visitor.BREAK: stop visiting altogether
+*         //   null: delete this node
+*         //   any value: replace this node with the returned value
+*       },
+*       leave(node, key, parent, path, ancestors) {
+*         // @return
+*         //   undefined: no action
+*         //   false: no action
+*         //   visitor.BREAK: stop visiting altogether
+*         //   null: delete this node
+*         //   any value: replace this node with the returned value
+*       }
+*     });
+*
+* Alternatively to providing enter() and leave() functions, a visitor can
+* instead provide functions named the same as the kinds of AST nodes, or
+* enter/leave visitors at a named key, leading to four permutations of
+* visitor API:
+*
+* 1) Named visitors triggered when entering a node a specific kind.
+*
+*     visit(ast, {
+*       Kind(node) {
+*         // enter the "Kind" node
+*       }
+*     })
+*
+* 2) Named visitors that trigger upon entering and leaving a node of
+*    a specific kind.
+*
+*     visit(ast, {
+*       Kind: {
+*         enter(node) {
+*           // enter the "Kind" node
+*         }
+*         leave(node) {
+*           // leave the "Kind" node
+*         }
+*       }
+*     })
+*
+* 3) Generic visitors that trigger upon entering and leaving any node.
+*
+*     visit(ast, {
+*       enter(node) {
+*         // enter any node
+*       },
+*       leave(node) {
+*         // leave any node
+*       }
+*     })
+*
+* 4) Parallel visitors for entering and leaving nodes of a specific kind.
+*
+*     visit(ast, {
+*       enter: {
+*         Kind(node) {
+*           // enter the "Kind" node
+*         }
+*       },
+*       leave: {
+*         Kind(node) {
+*           // leave the "Kind" node
+*         }
+*       }
+*     })
+*/
+func visit(root: Node, visitor: Visitor, keyMap: KeyMap?) -> SchemaDocument {
+    var visitorKeys = keyMap ?? QueryDocumentKeys
+    
+    var stack: Stack? = nil
+    
+    
+    // TODO: Work out how to check if root is an array of some sort
+    var inArray: Bool
+//    var inArray: Bool = Array.isArray(root)
+
+    var keys: [AnyObject] = [root]
+    var index = -1
+    // TODO: Figure out something better than AnyObjects
+    var edits: [AnyObject] = []
+    var parent: Node?
+    var path: [AnyObject] = []
+    var ancestors: [Node] = []
+    var newRoot = root
+    
+    repeat {
+        index++
+        var isLeaving = index == keys.count
+        var key: AnyObject?
+        var node: Node?
+        var isEdited = isLeaving && edits.count != 0
+        if isLeaving {
+            key = ancestors.count == 0 ? nil : path.popLast()
+            node = parent
+            parent = ancestors.popLast()
+            if isEdited {
+                let nodeCopy = node
+                node = nodeCopy
+                // TODO: Figure out if I need any of this - if a node is a Struct with only value types inside of it then I don't think I do
+//                if inArray {
+//                    let nodeCopy = node
+//                    node = nodeCopy
+//                } else {
+//                    var clone = {}
+//                    for (var k in node) {
+//                        if (node.hasOwnProperty(k)) {
+//                            clone[k] = node[k]
+//                        }
+//                    }
+//                    node = clone
+//                }
+                var editOffset = 0
+                for (var ii = 0; ii < edits.count; ii++) {
+                    let [editKey, editValue] = edits[ii]
+                    if inArray {
+                        editKey -= editOffset
+                    }
+                    if inArray && editValue == nil {
+                        node.removeAtIndex(editKey)
+                        node.splice(editKey, 1)
+                        editOffset++
+                    } else {
+                        node[editKey] = editValue
+                    }
+                }
+            }
+            if let stackCopy = stack {
+                index = stackCopy.index
+                keys = stackCopy.keys
+                edits = stackCopy.edits
+                inArray = stackCopy.inArray
+                stack = stackCopy.prev
+            }
+        } else {
+            key = parent ? inArray ? index : keys[index] : nil
+            node = parent ? parent[key] : newRoot
+            if node == nil || node == nil {
+                continue
+            }
+            if parent != nil {
+                path.append(key)
+            }
+        }
+        
+        var result
+        if !Array.isArray(node) {
+            if !isNode(node) {
+                throw Error("Invalid AST Node: " + JSON.stringify(node))
+            }
+            var visitFn = getVisitFn(visitor, isLeaving, node.kind)
+            if visitFn {
+                result = visitFn.call(visitor, node, key, parent, path, ancestors)
+                
+                if result == BREAK {
+                    break
+                }
+                
+                if result == false {
+                    if !isLeaving {
+                        path.popLast()
+                        continue
+                    }
+                } else if result != nil {
+                    edits.append([ key, result ])
+                    if !isLeaving {
+                        if isNode(result) {
+                            node = result
+                        } else {
+                            path.popLast()
+                            continue
+                        }
+                    }
+                }
+            }
+        }
+        
+        if result == nil && isEdited {
+            edits.append([ key, node ])
+        }
+        
+        if !isLeaving {
+            stack = Stack(inArray: inArray, index: index, keys: keys, edits: edits, prev: stack)
+            inArray = Array.isArray(node)
+            keys = inArray ? node : visitorKeys[node.kind] ?? []
+            index = -1
+            edits = []
+            if parent {
+                ancestors.append(parent)
+            }
+            parent = node
+        }
+    } while stack != nil
+    
+    if edits.count != 0 {
+        newRoot = edits[0][1]
+    }
+    
+    return newRoot
+}
+
+
+struct Stack {
+    var inArray: Bool
+    var index: Int
+    var keys: [AnyObject]
+    var edits: []
+    var prev: Stack
+}
+
+func isNode(maybeNode: Node?) {
+    return maybeNode != nil && maybeNode.kind == "string"
+}
+
+func getVisitFn(visitor, isLeaving, kind) {
+    var kindVisitor = visitor[kind]
+    if (kindVisitor) {
+        if (!isLeaving && typeof kindVisitor === 'function') {
+            // { Kind() {} }
+            return kindVisitor;
+        }
+        var kindSpecificVisitor = isLeaving ? kindVisitor.leave : kindVisitor.enter;
+        if (typeof kindSpecificVisitor === 'function') {
+            // { Kind: { enter() {}, leave() {} } }
+            return kindSpecificVisitor;
+        }
+        return;
+    }
+    var specificVisitor = isLeaving ? visitor.leave : visitor.enter;
+    if (specificVisitor) {
+        if (typeof specificVisitor === 'function') {
+            // { enter() {}, leave() {} }
+            return specificVisitor;
+        }
+        var specificKindVisitor = specificVisitor[kind];
+        if (typeof specificKindVisitor === 'function') {
+            // { enter: { Kind() {} }, leave: { Kind() {} } }
+            return specificKindVisitor;
+        }
+    }
+}
+

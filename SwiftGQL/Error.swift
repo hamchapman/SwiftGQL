@@ -138,12 +138,12 @@ func highlightSourceAtLocation(source: Source, location: SourceLocation) -> Stri
         (line >= 2 ?
         lpad(padLen, str: prevLineNum) + ": " + lines[line - 2] + "\n" : "") +
         lpad(padLen, str: lineNum) + ": " + lines[line - 1] + "\n" +
-        "".join(Array(count: 1 + padLen + location.column, repeatedValue: " ")) +
+        Array(count: 1 + padLen + location.column, repeatedValue: " ").joinWithSeparator("") +
         (line < lines.length ?
         lpad(padLen, nextLineNum) + ": " + lines[line] + "\n" : "")
     );
 }
 
 func lpad(len: Int, str: String) -> String {
-    return "".join(Array(count: len - str.characters.count, repeatedValue: " ")) + str
+    return Array(count: len - str.characters.count, repeatedValue: " ").joinWithSeparator("") + str
 }
