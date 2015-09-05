@@ -127,60 +127,44 @@ struct Location {
 * The list of all possible AST node types.
 */
 enum NodeList {
-    case Name
-    case Document
-    case OperationDefinition
-    case VariableDefinition
-    case Variable
-    case SelectionSet
-    case Field
-    case Argument
-    case FragmentSpread
-    case InlineFragment
-    case FragmentDefinition
-    case IntValue
-    case FloatValue
-    case StringValue
-    case BooleanValue
-    case EnumValue
-    case ListValue
-    case ObjectValue
-    case ObjectField
-    case Directive
-    case ListType
-    case NonNullType
-}
-
-class Node {
-    let kind: String
-    let loc: Location?
-    
-    init(kind: String, loc: Location? = nil) {
-        self.kind = kind
-        self.loc = loc
-    }
+    case Name(value: Name)
+    case Document(value: Document)
+    case OperationDefinition(value: OperationDefinition)
+    case VariableDefinition(value: VariableDefinition)
+    case Variable(value: Variable)
+    case SelectionSet(value: SelectionSet)
+    case Field(value: Field)
+    case Argument(value: Argument)
+    case FragmentSpread(value: FragmentSpread)
+    case InlineFragment(value: InlineFragment)
+    case FragmentDefinition(value: FragmentDefinition)
+    case IntValue(value: IntValue)
+    case FloatValue(value: FloatValue)
+    case StringValue(value: StringValue)
+    case BooleanValue(value: BooleanValue)
+    case EnumValue(value: EnumValue)
+    case ListValue(value: ListValue)
+    case ObjectValue(value: ObjectValue)
+    case ObjectField(value: ObjectField)
+    case Directive(value: Directive)
+    case ListType(value: ListType)
+    case NonNullType(value: NonNullType)
 }
 
 // Name
 
-class Name: Node {
+struct Name {
+    let kind = "Name"
     let value: String
-    
-    init(value: String, loc: Location? = nil) {
-        self.value = value
-        super.init(kind: "Name", loc: loc)
-    }
+    let loc: Location?
 }
 
 // Document
 
-class Document: Node {
+struct Document {
+    let kind = "Document"
     let definitions: [Definition]
-    
-    init(definitions: [Definition], loc: Location? = nil) {
-        self.definitions = definitions
-        super.init(kind: "Document", loc: loc)
-    }
+    let loc: Location?
 }
 
 enum Definition {
@@ -188,55 +172,36 @@ enum Definition {
     case FragmentDefinition
 }
 
-class OperationDefinition: Node {
+struct OperationDefinition {
     // TODO: Cleanup
     //    operation: 'query' | 'mutation';
+    let kind = "OperationDefinition"
     let operation: String
     let name: Name?
     let variableDefinitions: [VariableDefinition]?
     let directives: [Directive]?
     let selectionSet: SelectionSet
-    
-    init(operation: String, selectionSet: SelectionSet, loc: Location? = nil, name: Name?, variableDefinitions: [VariableDefinition]?, directives: [Directive]?) {
-        self.operation = operation
-        self.name = name
-        self.variableDefinitions = variableDefinitions
-        self.selectionSet = selectionSet
-        self.directives = directives
-        super.init(kind: "OperationDefinition", loc: loc)
-    }
+    let loc: Location?
 }
 
-class VariableDefinition: Node {
+struct VariableDefinition {
+    let kind = "VariableDefinition"
     let variable: Variable
     let type: Type
     let defaultValue: Value?
-    
-    init(varialbe: Variable, type: Type, defaultValue: Value?, loc: Location? = nil) {
-        self.type = type
-        // TODO: Sort out this stupid error about assigning variable to itself
-//        self.variable = variable
-        self.defaultValue = defaultValue
-        super.init(kind: "VariableDefinition", loc: loc)
-    }
+    let loc: Location?
 }
 
-class Variable: Node {
+struct Variable {
+    let kind = "Variable"
     let name: Name
-    
-    init(name: Name, loc: Location? = nil) {
-        self.name = name
-        super.init(kind: "Variable", loc: loc)
-    }
+    let loc: Location?
 }
 
-class SelectionSet: Node {
+struct SelectionSet {
+    let kind = "SelectionSet"
     let selections: [Selection]
-    
-    init(selections: [Selection], loc: Location? = nil) {
-        self.selections = selections
-        super.init(kind: "SelectionSet", loc: loc)
-    }
+    let loc: Location?
 }
 
 enum Selection {
@@ -245,73 +210,48 @@ enum Selection {
     case InlineFragment
 }
 
-class Field: Node {
+struct Field {
+    let kind = "Field"
     let alias: Name?
     let name: Name
     let arguments: [Argument]?
     let directives: [Directive]?
     let selectionSet: SelectionSet?
-    
-    init(name: Name, alias: Name?, arguments: [Argument]?, directives: [Directive]?, selectionSet: SelectionSet?, loc: Location? = nil) {
-        self.name = name
-        self.alias = alias
-        self.arguments = arguments
-        self.directives = directives
-        self.selectionSet = selectionSet
-        super.init(kind: "Field", loc: loc)
-    }
+    let loc: Location?
 }
 
-class Argument: Node {
+struct Argument {
+    let kind = "Argument"
     let name: Name
     let value: Value
-    
-    init(name: Name, value: Value, loc: Location? = nil) {
-        self.name = name
-        self.value = value
-        super.init(kind: "Argument", loc: loc)
-    }
+    let loc: Location?
 }
 
 
 // Fragments
 
-class FragmentSpread: Node {
+struct FragmentSpread {
+    let kind = "FragmentSpread"
     let name: Name
     let directives: [Directive]?
-    
-    init(name: Name, directives: [Directive]?, loc: Location? = nil) {
-        self.name = name
-        self.directives = directives
-        super.init(kind: "FragmentSpread", loc: loc)
-    }
+    let loc: Location?
 }
 
-class InlineFragment: Node {
+struct InlineFragment {
+    let kind = "InlineFragment"
     let typeCondition: NamedType
     let directives: [Directive]?
     let selectionSet: SelectionSet
-    
-    init(name: Name, typeCondition: NamedType, selectionSet: SelectionSet, directives: [Directive]?, loc: Location? = nil) {
-        self.typeCondition = typeCondition
-        self.directives = directives
-        self.selectionSet = selectionSet
-        super.init(kind: "InlineFragment", loc: loc)
-    }
+    let loc: Location?
 }
 
-class FragmentDefinition: Node {
+struct FragmentDefinition {
+    let kind = "FragmentDefinition"
     let name: Name
     let typeCondition: NamedType
     let directives: [Directive]?
     let selectionSet: SelectionSet
-    
-    init(name: Name, typeCondition: NamedType, selectionSet: SelectionSet, directives: [Directive]?, loc: Location? = nil) {
-        self.typeCondition = typeCondition
-        self.directives = directives
-        self.selectionSet = selectionSet
-        super.init(kind: "FragmentDefinition", loc: loc)
-    }
+    let loc: Location?
 }
 
 
@@ -329,92 +269,63 @@ enum Value {
     case ObjectValue
 }
 
-class IntValue: Node {
+struct IntValue {
+    let kind = "IntValue"
     let value: String
-    
-    init(value: String, loc: Location? = nil) {
-        self.value = value
-        super.init(kind: "IntValue", loc: loc)
-    }
+    let loc: Location?
 }
 
-class FloatValue: Node {
+struct FloatValue {
+    let kind = "FloatValue"
     let value: String
-    
-    init(value: String, loc: Location? = nil) {
-        self.value = value
-        super.init(kind: "FloatValue", loc: loc)
-    }
+    let loc: Location?
 }
 
-class StringValue: Node {
+struct StringValue {
+    let kind = "StringValue"
     let value: String
-    
-    init(value: String, loc: Location? = nil) {
-        self.value = value
-        super.init(kind: "StringValue", loc: loc)
-    }
+    let loc: Location?
 }
 
-class BooleanValue: Node {
+struct BooleanValue {
+    let kind = "BooleanValue"
     let value: Bool
-    
-    init(value: Bool, loc: Location? = nil) {
-        self.value = value
-        super.init(kind: "BooleanValue", loc: loc)
-    }
+    let loc: Location?
 }
 
-class EnumValue: Node {
+struct EnumValue {
+    let kind = "EnumValue"
     let value: String
-    
-    init(value: String, loc: Location? = nil) {
-        self.value = value
-        super.init(kind: "EnumValue", loc: loc)
-    }
+    let loc: Location?
 }
 
-class ListValue: Node {
+struct ListValue {
+    let kind = "ListValue"
     let values: [Value]
-    
-    init(values: [Value], loc: Location? = nil) {
-        self.values = values
-        super.init(kind: "ListValue", loc: loc)
-    }
+    let loc: Location?
 }
 
-class ObjectValue: Node {
+struct ObjectValue {
+    let kind = "ObjectValue"
     let fields: [ObjectField]
-    
-    init(fields: [ObjectField], loc: Location? = nil) {
-        self.fields = fields
-        super.init(kind: "ObjectValue", loc: loc)
-    }
+    let loc: Location?
 }
 
-class ObjectField: Node {
+struct ObjectField {
+    let kind = "ObjectField"
     let name: Name
     let value: Value
-    
-    init(name: Name, value: Value, loc: Location? = nil) {
-        self.name = name
-        self.value = value
-        super.init(kind: "ObjectField", loc: loc)
-    }
+    let loc: Location?
 }
 
 
 // Directives
 
-class Directive: Node {
+struct Directive {
+    let kind = "Directive"
     let name: Name
     let arguments: [Argument]?
-    
-    init(name: Name, arguments: [Argument]?, loc: Location? = nil) {
-        self.name = name
-        self.arguments = arguments
-        super.init(kind: "Directive", loc: loc)
-    }
+    let loc: Location?
 }
 
 
@@ -426,32 +337,23 @@ enum Type {
     case NonNullType
 }
 
-class NamedType: Node {
+struct NamedType {
+    let kind = "NamedType"
     let name: Name
-    
-    init(name: Name, loc: Location? = nil) {
-        self.name = name
-        super.init(kind: "NamedType", loc: loc)
-    }
+    let loc: Location?
 }
 
-class ListType: Node {
+struct ListType {
+    let kind = "ListType"
     let type: Type
-    
-    init(type: Type, loc: Location? = nil) {
-        self.type = type
-        super.init(kind: "ListType", loc: loc)
-    }
+    let loc: Location?
 }
 
-class NonNullType: Node {
+struct NonNullType {
     // TODO: Sort out selection of subset of enum (probably just use an initialiser - check out where NonNullType is being created)
+    let kind = "NonNullType"
     let type: Type
-    
-    init(type: Type, loc: Location? = nil) {
-        self.type = type
-        super.init(kind: "NonNullType", loc: loc)
-    }
+    let loc: Location?
 }
 
 
