@@ -31,12 +31,12 @@ struct SchemaDocument {
 }
 
 enum SchemaDefinition {
-    case TypeDef(definition: TypeDefinition) // (name: Name, fields: [FieldDefinition], loc: Location?, interfaces: [NamedType]?)
-    case InterfaceDef(definition: InterfaceDefinition) // name: Name, fields: [FieldDefinition], loc: Location?
-    case UnionDef(definition: UnionDefinition) // name: Name, loc: Location?, types: [NamedType]
-    case ScalarDef(definition: ScalarDefinition) // name: Name, loc: Location?
-    case EnumDef(definition: EnumDefinition) // name: Name, values: [EnumValueDefinition], loc: Location?
-    case InputObjectDef(definition: InputObjectDefinition) // name: Name, fields: [FieldDefinition], loc: Location?
+    case TypeDef(definition: TypeDefinition)
+    case InterfaceDef(definition: InterfaceDefinition)
+    case UnionDef(definition: UnionDefinition)
+    case ScalarDef(definition: ScalarDefinition)
+    case EnumDef(definition: EnumDefinition)
+    case InputObjectDef(definition: InputObjectDefinition)
 }
 
 struct FieldDefinition {

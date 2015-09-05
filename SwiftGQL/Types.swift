@@ -8,22 +8,6 @@
 
 import Foundation
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 enum GraphQLType {
     case GraphQLScalarType
     case GraphQLObjectType
@@ -34,7 +18,3 @@ enum GraphQLType {
     case GraphQLList
     case GraphQLNonNull
 }
-
-//func isType(type: AnyObject) -> Bool {
-//    type is
-//}
